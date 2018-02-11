@@ -1,10 +1,12 @@
 
 import os
+import subprocess
+import traceback
 import wx
 
 have_winreg = False
 try:
-    import _winreg
+    import winreg
     have_winreg = True
 except:
     pass
@@ -13,9 +15,9 @@ have_win32api = False
 try:
     from win32api import GetFileVersionInfo, LOWORD, HIWORD
     have_win32api = True
-except:
+except Exception as e:
     pass
-
+    
 from gui.trl_scu_base import TrlScuMainFrame
 
 LevelChoices = {
@@ -149,12 +151,15 @@ class MainFrame(TrlScuMainFrame):
         if not have_winreg:
             return
         try:
-            aReg = _winreg.ConnectRegistry(None,HKEY_LOCAL_MACHINE)
-            aKey = _winreg.OpenKey(aReg, r"SOFTWARE\"Crystal Dynamics\Tomb Raider: Legend")
-            val = _winreg.QueryValueEx(aKey, "InstallPath")
-            self.SetLegendExecutable(os.path.join(val, "trl.exe"))
-        except _winreg.EnvironmentError:
-            pass
+            aReg = winreg.ConnectRegistry(None, winreg.HKEY_LOCAL_MACHINE)
+            aKey = winreg.OpenKey(aReg, r"SOFTWARE\"Crystal Dynamics\Tomb Raider: Legend")
+            val = winreg.QueryValueEx(aKey, "InstallPath")
+            self.SetLegendExecutable(os.path.join(val, "tr7.exe"))
+        except Exception as e:
+            wx.MessageBox(
+                "Could not auto-detect TR Legend:\n\n%s" % (str(e), ),
+                "Auto detection failed",
+                wx.ICON_WARNING)
         
     def SetLegendExecutable(self, exe_path):
         exe_path = os.path.abspath(exe_path)
@@ -170,6 +175,7 @@ class MainFrame(TrlScuMainFrame):
         
     def GetExecutableVersion(self, filename):
         if not have_win32api:
+            wx.MessageBox("No api")
             return 0, 0, 0, 0
         try:
             info = GetFileVersionInfo(filename, "\\")
@@ -200,7 +206,7 @@ class MainFrame(TrlScuMainFrame):
             if check_box.IsChecked():
                 opts.append(key)
                 if text_box:
-                    opts.append(text_box.GetValue())
+                    opts.append('"%s"' % (text_box.GetValue(), ))
         return opts
         
     def _GetCommandLineOptions(self):
@@ -212,8 +218,40 @@ class MainFrame(TrlScuMainFrame):
         options.extend(self._GetAdvancedOptions())
         return options
 
+    def _WriteConfig(self, legend_install_dir):
+        config_dir = os.path.join(legend_install_dir, "TR7", "GAME", "PC")
+        if not os.path.isdir(config_dir):
+            try:
+                os.makedirs(config_dir)
+            except Exception as e:
+                raise Exception("Could not create config directory '%s': %s",
+                    (config_dir, str(e)))
+        command_line_args = self._GetCommandLineOptions()
+        config_file_path = os.path.join(config_dir, "TR7.arg")
+        with open(config_file_path, "w+") as config_file:
+            config_file.write(" ".join(command_line_args))
+        
+    def _LaunchGame(self, exe_path):
+        p = subprocess.Popen(
+            executable=exe_path, 
+            args=[],
+            cwd=os.path.dirname(exe_path))
+        # p.wait()
+        
     def OnRun(self, event):
-        wx.MessageBox("%s" % (self._GetCommandLineOptions(), ))
+        try:
+            exe_path = self.m_exe_picker.GetPath()
+            if not exe_path:
+                raise Exception("Please set the Tomb Raider Legend executable path!");
+            if not os.path.isfile(exe_path):
+                raise Exception("Tomb Raider Legend executable was not found at '%s'!" % (exe_path, ))
+            legend_install_dir = os.path.dirname(exe_path)
+            self._WriteConfig(legend_install_dir)
+            self._LaunchGame(exe_path)
+        except Exception as e:
+            wx.MessageBox("%s" % (e, ), "Error launching TR Legend", wx.ICON_ERROR)
+            traceback.print_exc()
+        
 
 class Application(wx.App):
 

@@ -62,6 +62,24 @@ class TrlScuMainFrame ( wx.Frame ):
 		self.m_main_content_sizer.Fit( self.m_main_tab )
 		self.m_content_notebook.AddPage( self.m_main_tab, u"General Settings", True )
 		self.m_adv_tab = wx.Panel( self.m_content_notebook, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_outer_dev_opts_sizer = wx.StaticBoxSizer( wx.StaticBox( self.m_adv_tab, wx.ID_ANY, u"Developer options" ), wx.VERTICAL )
+		
+		self.m_inner_dev_opts_content_sizer = wx.FlexGridSizer( 0, 2, 0, 0 )
+		self.m_inner_dev_opts_content_sizer.AddGrowableCol( 1 )
+		self.m_inner_dev_opts_content_sizer.SetFlexibleDirection( wx.BOTH )
+		self.m_inner_dev_opts_content_sizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+		
+		
+		self.m_outer_dev_opts_sizer.Add( self.m_inner_dev_opts_content_sizer, 1, wx.EXPAND, 5 )
+		
+		self.m_info_text = wx.StaticText( self.m_outer_dev_opts_sizer.GetStaticBox(), wx.ID_ANY, u"Please note, that most of the options specified here don't have any effect. \nThey are mentioned in the executable but may be disabled in the code.", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_info_text.Wrap( -1 )
+		self.m_outer_dev_opts_sizer.Add( self.m_info_text, 0, wx.ALL, 5 )
+		
+		
+		self.m_adv_tab.SetSizer( self.m_outer_dev_opts_sizer )
+		self.m_adv_tab.Layout()
+		self.m_outer_dev_opts_sizer.Fit( self.m_adv_tab )
 		self.m_content_notebook.AddPage( self.m_adv_tab, u"Advanced Settings (Developer Hacks)", False )
 		
 		main_frame_sizer.Add( self.m_content_notebook, 1, wx.EXPAND |wx.ALL, 5 )
@@ -125,6 +143,7 @@ class TrlScuMainFrame ( wx.Frame ):
 		# Connect Events
 		self.m_level_choice.Bind( wx.EVT_CHOICE, self.OnSelectLevel )
 		self.m_exe_picker.Bind( wx.EVT_FILEPICKER_CHANGED, self.OnExeSelected )
+		self.m_run_btn.Bind( wx.EVT_BUTTON, self.OnRun )
 	
 	def __del__( self ):
 		pass
@@ -135,6 +154,9 @@ class TrlScuMainFrame ( wx.Frame ):
 		event.Skip()
 	
 	def OnExeSelected( self, event ):
+		event.Skip()
+	
+	def OnRun( self, event ):
 		event.Skip()
 	
 

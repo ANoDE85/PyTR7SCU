@@ -58,7 +58,7 @@ OutfitChoices = {
     "Snowsuit":"lara_catsuit_snow",
     "Classic Green":"lara_classic",
     "Classic White": "lara_classic_alt",
-    "Evening Dress (Lara might not react)":"lara_evening",
+    "Evening Dress (Buggy outside of Japan level)":"lara_evening",
     "Evening Ripped": "lara_evening_alt",
     "Evening with Dragon Tatoo":"lara_evening_alta",
     "Evening Red": "lara_evening_red",
@@ -81,20 +81,40 @@ OutfitChoices = {
     "Amanda Winter": "amanda_player_alt"
 }
 
+AdvancedOptions = [
+    ("-DRAWMONSTERATTACK", "Draw monster attack" , False),
+    ("-DRAWMONSTERCOMBAT", "Draw monster combat", False),
+    ("-EASYCHEAT", "Easy Cheat mode", False),
+    ("-FONTNAME", "Font name", True),
+    ("-CHAPTERVARS", "Chapter variables", True),
+    ("-MAINMENU", "Show Main Menu", False),
+    ("-NOHINTS", "Dont' show hints", False),
+    ("-NOMONSTERATTACK", "No monster attack", False),
+    ("-NOTRACE", "No trace", False),
+    ("-NOVIBRATION", "No vibration", False),
+    ("-NOHEALTH", "God Mode", False),
+    ("-NOMONSTERHEALTH", "No monster health", False),
+]
+
 class MainFrame(TrlScuMainFrame):
     def __init__(self):
         TrlScuMainFrame.__init__(self, None)
         self.__m_current_outfit = None
         self.__m_current_level = None
-        self._InitLayout()
+        self.__m_current_adv_opts = {}
+        self._m_outfit_boxes = []
+        self._m_devopts_controls = {}
+        self._InitMainOptions()
+        self._InitAdvancedOptions()
         self._FindLegend()
+        self.Fit()
 
-    def _InitLayout(self):
+    def _InitMainOptions(self):
         for name, id in LevelChoices.items():
             self.m_level_choice.Append(name, id)
         self.m_level_choice.Select(0)
         
-        self._m_outfit_boxes = []
+        
         is_first = True
         for name, id in OutfitChoices.items():
             if is_first:
@@ -103,12 +123,27 @@ class MainFrame(TrlScuMainFrame):
                 flags = 0
             is_first = False
             outfit_button = wx.RadioButton( self.m_outer_radio_sizer.GetStaticBox(), wx.ID_ANY, name, wx.DefaultPosition, wx.DefaultSize, flags )
-            outfit_button.Bind( wx.EVT_RADIOBUTTON, lambda evt: self.OnOutfitChoice(evt, id))
+            outfit_button.Bind( wx.EVT_RADIOBUTTON, self.OnOutfitChoice)
             self._m_outfit_boxes.append(outfit_button)
             self.m_outfit_sizer.Add( outfit_button, 0, wx.ALL, 5 )
-
         self.m_outer_radio_sizer.Layout()
-        self.Fit()
+        
+    def _InitAdvancedOptions(self):
+        self._m_devopts_controls = {}
+        for (key, caption, has_parameter) in AdvancedOptions:
+            text_box = None
+            check_box = wx.CheckBox(self.m_outer_dev_opts_sizer.GetStaticBox(), wx.ID_ANY, caption, wx.DefaultPosition, wx.DefaultSize, 0, name=key)
+            check_box.SetToolTip(key)
+            check_box.Bind(wx.EVT_CHECKBOX, self.OnToggleAdvanced)
+            self.m_inner_dev_opts_content_sizer.Add( check_box, 0, wx.ALL, 5 )
+            if has_parameter:
+                text_box = wx.TextCtrl( self.m_outer_dev_opts_sizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+                text_box.Enabled = False
+                self.m_inner_dev_opts_content_sizer.Add( text_box, 0, wx.ALL|wx.EXPAND, 5 )
+            else:
+                self.m_inner_dev_opts_content_sizer.Add( (0, 0), 0, wx.ALL, 5 )
+            self._m_devopts_controls[key] =  (check_box, text_box)
+        self.m_outer_dev_opts_sizer.Layout()
         
     def _FindLegend(self):  
         if not have_winreg:
@@ -147,12 +182,38 @@ class MainFrame(TrlScuMainFrame):
     def OnExeSelected(self, event):
         self.SetLegendExecutable(event.GetPath())
     
-    def OnOutfitChoice(self, evt, outfit):
-        self.__m_current_outfit = outfit
+    def OnOutfitChoice(self, evt):
+        self.__m_current_outfit = OutfitChoices[evt.GetEventObject().GetLabelText()]
         
     def OnSelectLevel(self, event):
         self.__m_current_level = self.m_level_choice.GetClientData(event.GetSelection())
 
+    def OnToggleAdvanced(self, event):
+        key = event.GetEventObject().GetName()
+        (check_box, text_box) = self._m_devopts_controls[key]
+        if text_box:
+            text_box.Enabled = check_box.IsChecked()
+            
+    def _GetAdvancedOptions(self):
+        opts = []
+        for key, (check_box, text_box) in self._m_devopts_controls.items():
+            if check_box.IsChecked():
+                opts.append(key)
+                if text_box:
+                    opts.append(text_box.GetValue())
+        return opts
+        
+    def _GetCommandLineOptions(self):
+        options = []
+        if self.__m_current_level:
+            options.extend(["-NOMAINMENU", "-CHAPTER", "%d" % (self.__m_current_level, )])
+        if self.__m_current_outfit:
+            options.extend(["-PLAYER", self.__m_current_outfit])
+        options.extend(self._GetAdvancedOptions())
+        return options
+
+    def OnRun(self, event):
+        wx.MessageBox("%s" % (self._GetCommandLineOptions(), ))
 
 class Application(wx.App):
 

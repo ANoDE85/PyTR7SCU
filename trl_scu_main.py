@@ -152,9 +152,9 @@ class MainFrame(TrlScuMainFrame):
             return
         try:
             aReg = winreg.ConnectRegistry(None, winreg.HKEY_LOCAL_MACHINE)
-            aKey = winreg.OpenKey(aReg, r"SOFTWARE\"Crystal Dynamics\Tomb Raider: Legend")
-            val = winreg.QueryValueEx(aKey, "InstallPath")
-            self.SetLegendExecutable(os.path.join(val, "tr7.exe"))
+            aKey = winreg.OpenKey(aReg, r"SOFTWARE\Crystal Dynamics\Tomb Raider: Legend")
+            val = winreg.QueryValueEx(aKey, "InstallPath")[0]
+            self.SetLegendExecutable(os.path.join(val, "trl.exe"))
         except Exception as e:
             wx.MessageBox(
                 "Could not auto-detect TR Legend:\n\n%s" % (str(e), ),

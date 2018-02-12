@@ -93,7 +93,7 @@ class TrlScuMainFrame ( wx.Frame ):
 		self.m_exe_label.Wrap( -1 )
 		bottom_info_sizer.Add( self.m_exe_label, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_exe_picker = wx.FilePickerCtrl( self, wx.ID_ANY, wx.EmptyString, u"Select a file", u"TR Legend Executable (tr7.exe)|tr7.exe|All executables (*.exe)|*.exe", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE|wx.FLP_FILE_MUST_EXIST|wx.FLP_OPEN|wx.FLP_SMALL )
+		self.m_exe_picker = wx.FilePickerCtrl( self, wx.ID_ANY, wx.EmptyString, u"Select a file", u"TR Legend Executable (trl.exe)|trl.exe|All executables (*.exe)|*.exe", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE|wx.FLP_FILE_MUST_EXIST|wx.FLP_OPEN|wx.FLP_SMALL )
 		bottom_info_sizer.Add( self.m_exe_picker, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		self.m_version_label = wx.StaticText( self, wx.ID_ANY, u"TR Legend Version", wx.DefaultPosition, wx.DefaultSize, 0 )

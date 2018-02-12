@@ -116,6 +116,9 @@ class TrlScuMainFrame ( wx.Frame ):
 		self.m_load_btn = wx.Button( self, wx.ID_ANY, u"Load Settings", wx.DefaultPosition, wx.DefaultSize, 0 )
 		lower_button_sizer.Add( self.m_load_btn, 0, wx.ALL, 5 )
 		
+		self.m_reset_btn = wx.Button( self, wx.ID_ANY, u"Reset", wx.DefaultPosition, wx.DefaultSize, 0 )
+		lower_button_sizer.Add( self.m_reset_btn, 0, wx.ALL, 5 )
+		
 		
 		lower_button_sizer.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
@@ -143,7 +146,11 @@ class TrlScuMainFrame ( wx.Frame ):
 		# Connect Events
 		self.m_level_choice.Bind( wx.EVT_CHOICE, self.OnSelectLevel )
 		self.m_exe_picker.Bind( wx.EVT_FILEPICKER_CHANGED, self.OnExeSelected )
+		self.m_save_btn.Bind( wx.EVT_BUTTON, self.OnSaveSettings )
+		self.m_load_btn.Bind( wx.EVT_BUTTON, self.OnLoadSettings )
+		self.m_reset_btn.Bind( wx.EVT_BUTTON, self.OnReset )
 		self.m_run_btn.Bind( wx.EVT_BUTTON, self.OnRun )
+		self.Bind( wx.EVT_MENU, self.OnAbout, id = self.m_mi_help_about.GetId() )
 	
 	def __del__( self ):
 		pass
@@ -156,7 +163,19 @@ class TrlScuMainFrame ( wx.Frame ):
 	def OnExeSelected( self, event ):
 		event.Skip()
 	
+	def OnSaveSettings( self, event ):
+		event.Skip()
+	
+	def OnLoadSettings( self, event ):
+		event.Skip()
+	
+	def OnReset( self, event ):
+		event.Skip()
+	
 	def OnRun( self, event ):
+		event.Skip()
+	
+	def OnAbout( self, event ):
 		event.Skip()
 	
 

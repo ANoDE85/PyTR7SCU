@@ -1,6 +1,8 @@
 import sys
 from cx_Freeze import setup, Executable
 
+import __version__
+
 # Dependencies are automatically detected, but it might need fine tuning.
 build_exe_options = {"packages": ["os", "platform", "win32api"], "excludes": ["tkinter"]}
 
@@ -10,8 +12,8 @@ base = None
 if sys.platform == "win32":
     base = "Win32GUI"
 
-setup(  name = "TR Legend SCU",
-        version = "0.10",
-        description = "TR Legend SCU",
+setup(  name = __version__.ProgramName,
+        version = __version__.Version,
+        description = __version__.Description,
         options = {"build_exe": build_exe_options},
         executables = [Executable("trl_scu_main.py", base=base)])

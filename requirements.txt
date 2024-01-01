@@ -1,0 +1,3 @@
+wxpython==4.2.1
+cx_freeze==6.15.12
+pywin32==306

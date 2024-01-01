@@ -7,7 +7,9 @@ import __version__
 build_exe_options = {
     "packages": ["os", "platform", "win32api"], 
     "excludes": ["tkinter"],
-    "include_msvcr": True
+    "include_files": ["LICENSE"],
+    "include_msvcr": True,
+    "optimize": 2
 }
 
 # GUI applications require a different base on Windows (the default is for a

@@ -1,7 +1,7 @@
 
 ProgramName = "Tomb Raider: Legend SCU"
-Version = "0.0.10.1"
-Copyright = "Copyright 2018 ANoDE85"
+Version = "0.0.11.0"
+Copyright = "Copyright 2018 - 2023 ANoDE85"
 Description = "Tomb Raider: Legend Startup Configuration Utility"
 ProjectSite = ("https://github.com/ANoDE85/PyTR7SCU", "Project Website")
 Contributers = [
